@@ -21,6 +21,7 @@ from __future__ import (absolute_import, division, print_function,
 
 from .EKF import *
 from .ensemble_kalman_filter import *
+from .enpkf import *
 from .fading_memory import *
 from .fixed_lag_smoother import FixedLagSmoother
 from .kalman_filter import *

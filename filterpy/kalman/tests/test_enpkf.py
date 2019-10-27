@@ -17,23 +17,22 @@ for more information.
 from numpy.random import randn
 import numpy as np
 import matplotlib.pyplot as plt
-from filterpy.kalman import EnsembleKalmanFilter as EnKF
+from filterpy.kalman import enpkf as EnPKF
 from filterpy.common import Q_discrete_white_noise, Saver
 from math import cos, sin
 
 DO_PLOT = False
 
 def test_1d_const_vel():
-    def hx(x):
-        return np.array([x[0]])
 
+    H = np.array([[1, 0]])
     F = np.array([[1., 1.],[0., 1.]])
     def fx(x, dt):
         return np.dot(F, x)
 
     x = np.array([0., 1.])
     P = np.eye(2)* 100.
-    f = EnKF(x=x, P=P, dim_z=1, dt=1., N=8, hx=hx, fx=fx)
+    f = EnPKF.EnsembleParticleKalmanFilter(x=x, P=P, dim_z=1, dt=1., N=8, H=H, fx=fx)
 
     std_noise = 10.
 
@@ -64,7 +63,7 @@ def test_1d_const_vel():
     ps = np.asarray(ps)
 
     if DO_PLOT:
-        plt.plot(results, label='EnKF')
+        plt.plot(results, label='EnPKF')
         plt.plot(measurements, c='r', label='z')
         plt.plot (results-ps, c='k',linestyle='--', label='3$\sigma$')
         plt.plot(results+ps, c='k', linestyle='--')
@@ -75,9 +74,8 @@ def test_1d_const_vel():
 
 
 def test_circle():
-    def hx(x):
-        return np.array([x[0], x[3]])
 
+    H = np.array([[1, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0]])
     F = np.array([[1., 1., .5, 0., 0., 0.],
                   [0., 1., 1., 0., 0., 0.],
                   [0., 0., 1., 0., 0., 0.],
@@ -90,7 +88,7 @@ def test_circle():
 
     x = np.array([50., 0., 0, 0, .0, 0.])
     P = np.eye(6)* 100.
-    f = EnKF(x=x, P=P, dim_z=2, dt=1., N=30, hx=hx, fx=fx)
+    f = EnPKF.EnsembleParticleKalmanFilter(x=x, P=P, dim_z=2, dt=1., N=30, H=H, fx=fx, gamma=0.9)
 
     std_noise = .1
 
@@ -124,7 +122,7 @@ def test_circle():
     measurements = np.asarray(measurements)
 
     if DO_PLOT:
-        plt.plot(results[:,0], results[:,2], label='EnKF')
+        plt.plot(results[:,0], results[:,2], label='EnPKF')
         plt.plot(measurements[:,0], measurements[:,1], c='r', label='z')
         #plt.plot (results-ps, c='k',linestyle='--', label='3$\sigma$')
         #plt.plot(results+ps, c='k', linestyle='--')
